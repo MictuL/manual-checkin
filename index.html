@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Manual interactivo de Focus: cómo hacer Check In y Check Out en la plataforma interna de evaluación de Axen Capital.">
+<meta name="theme-color" content="#0071CE">
+<meta name="author" content="Rodrigo Fabela">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<title>¿Cómo hacer Check In? · Manual Focus · Axen Capital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: cover screen → one-screen guide. Simulated browser window centered (viewport fixed at 1920×1090), click markers over it, step panel below.
+   Single light look in Axen Capital colors: white + logo blue. */
+:root{
+  --white:#FFFFFF; --bg:#FFFFFF; --tint:#F2F7FD; --ink:#101820; --muted:#556275; --line:#D5E3F2;
+  --blue:#0071CE; --blue-deep:#005AA6; --blue-soft:#E2EFFB; --blue-mid:#7DB4E6;
+  --chrome:#EDF2F8; --chrome-line:#D3DDE9;
+  --shadow:0 22px 60px -28px rgba(0,61,112,.45);
+  --logo-ink:#101820; --logo-accent:#0071CE;
+  --f-display:"Sora","Segoe UI",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{min-height:100%;display:flex;flex-direction:column}
+a{color:var(--blue)}
+
+/* ---------- Cover ---------- */
+.cover{position:fixed;inset:0;z-index:50;background:var(--white);display:flex;flex-direction:column;align-items:center;padding:calc(28px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px));overflow:auto}
+.cover::before{content:"";position:absolute;inset:auto 0 0 0;height:38%;background:linear-gradient(to top,var(--blue-soft),transparent);pointer-events:none}
+.cover .logo{height:44px}
+.cover .center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0;position:relative;max-width:900px}
+.cover h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7.2vw,88px);line-height:1.04;letter-spacing:-.035em;margin:0;text-wrap:balance;color:var(--ink)}
+.cover h1 em{font-style:normal;color:var(--blue)}
+.cover .sub{margin:18px 0 0;font-size:13px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--muted)}
+.start{margin-top:clamp(36px,7vh,64px);appearance:none;border:0;cursor:pointer;font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3.2vw,32px);letter-spacing:-.01em;color:var(--white);background:var(--blue);padding:clamp(18px,2.6vw,26px) clamp(56px,8vw,96px);border-radius:999px;display:inline-flex;align-items:center;gap:14px;animation:blink 1.3s ease-in-out infinite;box-shadow:0 0 0 0 rgba(0,113,206,.5)}
+.start svg{width:.9em;height:.9em}
+.start:hover{background:var(--blue-deep);animation-play-state:paused}
+.start:focus-visible{outline:4px solid var(--blue-mid);outline-offset:4px}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,113,206,.45)}50%{opacity:.62;box-shadow:0 0 0 18px rgba(0,113,206,0)}}
+.foot{position:relative;font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;align-items:center;text-align:center}
+.foot i{width:4px;height:4px;border-radius:50%;background:var(--blue)}
+.foot .bar{color:var(--line)}
+.sitefoot{background:var(--white);border-top:1px solid var(--line);padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px))}
+
+/* ---------- Header ---------- */
+.top{display:flex;align-items:center;gap:16px;padding:12px max(16px,3vw);background:var(--white);border-bottom:2px solid var(--blue)}
+.logo{height:30px;width:auto;display:block;flex:none}
+.home{appearance:none;border:0;background:none;padding:0;cursor:pointer;display:block}
+.home:focus-visible{outline:2px solid var(--blue);outline-offset:4px;border-radius:4px}
+.top .sep{width:1px;height:28px;background:var(--line);flex:none}
+.top .name{display:flex;flex-direction:column;min-width:0}
+.top .name b{font-family:var(--f-display);font-weight:600;font-size:15px;letter-spacing:-.01em}
+.top .name span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .count{margin-left:auto;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.top .count strong{color:var(--blue);font-weight:700}
+
+/* ---------- Main ---------- */
+main{flex:1;display:flex;flex-direction:column;align-items:center;padding:18px 16px 26px;background:var(--tint)}
+.wrap{width:min(1180px,100%,calc((100dvh - 400px) * 1.7615));min-width:min(100%,640px);display:flex;flex-direction:column;gap:14px}
+
+.progress{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px}
+.progress button{appearance:none;border:0;padding:8px 0;background:none;cursor:pointer;display:block}
+.progress button i{display:block;height:4px;border-radius:2px;background:var(--line);transition:background .25s}
+.progress button.done i{background:var(--blue-mid)}
+.progress button.current i{background:var(--blue)}
+.progress button:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+
+/* ---------- Simulated browser ---------- */
+.browser{position:relative;width:100%;max-width:100%;border-radius:12px;background:var(--chrome);border:1px solid var(--chrome-line);box-shadow:var(--shadow)}
+.tabs{display:flex;align-items:flex-end;gap:6px;padding:8px 12px 0;height:36px}
+.dots{display:flex;gap:6px;align-self:center;margin-right:8px}
+.dots i{width:11px;height:11px;border-radius:50%;background:#C9D4E2}
+.tab{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:9px 9px 0 0;padding:6px 14px;font-size:12.5px;min-width:0;max-width:240px;color:var(--ink)}
+.tab .fav{width:14px;height:14px;border-radius:4px;background:var(--blue);flex:none;display:grid;place-items:center}
+.tab .fav::after{content:"";width:6px;height:6px;background:var(--white);transform:rotate(45deg) translate(-1px,-1px);clip-path:polygon(0 0,100% 0,0 100%)}
+.tab span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tab .x{color:var(--muted);font-size:14px;line-height:1;margin-left:6px}
+.plus{color:var(--muted);font-size:18px;padding:0 8px 6px}
+.toolbar{display:flex;align-items:center;gap:10px;background:var(--white);padding:0 12px;height:48px;border-bottom:1px solid var(--chrome-line)}
+.toolbar .ico{width:18px;height:18px;color:#7A8697;flex:none}
+.addr{flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:999px;background:var(--chrome);font-size:13.5px;color:var(--ink);transition:box-shadow .2s,background .2s}
+.addr.focus{background:var(--white);box-shadow:inset 0 0 0 2px var(--blue)}
+.addr .ico{width:15px;height:15px}
+.addr .url{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.addr .url .scheme{color:var(--muted)}
+.addr .caret{width:1.5px;height:16px;background:var(--blue);flex:none;margin-left:-6px;animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.addr kbd{margin-left:auto;font:inherit;font-size:11.5px;font-weight:600;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:2px 8px;flex:none;transition:opacity .25s}
+.viewport{position:relative;width:100%;aspect-ratio:1920/1090;max-width:100%;overflow:hidden;background:var(--white);border-radius:0 0 11px 11px;container-type:inline-size}
+.viewport img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .35s ease}
+.viewport img.out{opacity:0}
+.newtab{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2cqw;background:var(--white)}
+.newtab .nt-title{font-family:var(--f-display);font-weight:600;font-size:2.6cqw;color:#9AA6B6;letter-spacing:-.02em}
+.newtab .search{width:46cqw;height:4.6cqw;border-radius:999px;border:1px solid var(--chrome-line);display:flex;align-items:center;gap:1.2cqw;padding:0 1.8cqw;color:#8C98A8;font-size:1.35cqw;box-shadow:0 1px 6px rgba(16,24,32,.06)}
+.newtab .search svg{width:1.6cqw;height:1.6cqw}
+.newtab .tiles{display:flex;gap:2.4cqw;margin-top:1cqw}
+.newtab .tiles i{width:5.2cqw;height:5.2cqw;border-radius:1.2cqw;background:var(--chrome)}
+
+/* ---------- Markers ---------- */
+.overlay{position:absolute;inset:0;pointer-events:none;z-index:5}
+.hot{position:absolute;pointer-events:auto;cursor:pointer;background:transparent;padding:0;border:3px solid var(--blue);border-radius:10px;box-shadow:0 0 0 3px var(--white),0 0 0 7px rgba(0,113,206,.28);transition:left .45s cubic-bezier(.3,.7,.2,1),top .45s cubic-bezier(.3,.7,.2,1),width .45s cubic-bezier(.3,.7,.2,1),height .45s cubic-bezier(.3,.7,.2,1)}
+.hot.round{border-radius:999px}
+.hot::after{content:"";position:absolute;inset:-3px;border-radius:inherit;border:3px solid var(--blue);animation:pulse 1.6s ease-out infinite}
+.hot:focus-visible{outline:3px solid var(--ink);outline-offset:6px}
+.hot.round::after{animation-name:pulseWide}
+@keyframes pulseWide{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.02,1.45)}}
+@keyframes pulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.35)}}
+.zone{position:absolute;border:2px dashed var(--blue);border-radius:8px;background:rgba(0,113,206,.07)}
+.zone span{position:absolute;left:-2px;bottom:100%;margin-bottom:6px;background:var(--blue);color:var(--white);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:5px;white-space:nowrap}
+.zone.below span{bottom:auto;top:100%;margin:6px 0 0}
+.cursor{position:absolute;width:30px;height:30px;transition:left .6s cubic-bezier(.3,.7,.2,1),top .6s cubic-bezier(.3,.7,.2,1);filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));z-index:3}
+.cursor svg{width:100%;height:100%}
+.ripple{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--blue);animation:rip .55s ease-out forwards;z-index:2}
+@keyframes rip{from{transform:scale(1);opacity:.7}to{transform:scale(7);opacity:0}}
+.tip{position:absolute;z-index:4;width:max-content;max-width:300px;background:var(--blue);color:var(--white);padding:10px 13px;border-radius:9px;font-size:13.5px;line-height:1.35;font-weight:500;box-shadow:0 12px 30px -10px rgba(0,61,112,.6);transition:opacity .25s}
+.tip b{display:block;font-family:var(--f-display);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;margin-bottom:2px;font-weight:600}
+.tip::before{content:"";position:absolute;left:var(--ax,50%);width:12px;height:12px;background:var(--blue);transform:translateX(-50%) rotate(45deg)}
+.tip.below::before{top:-5px}.tip.above::before{bottom:-5px}
+.tip.right::before{left:-5px;top:50%;transform:translateY(-50%) rotate(45deg)}
+.tip{pointer-events:auto}
+.tip .tip-url{display:block;margin-top:4px;font-weight:700;font-size:14.5px;white-space:nowrap;user-select:all}
+.tip a{display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:var(--white);color:var(--blue);font-weight:700;font-size:13px;text-decoration:none;padding:6px 11px;border-radius:7px}
+.tip a:hover{background:var(--blue-soft)}
+.tip a:focus-visible{outline:2px solid var(--white);outline-offset:2px}
+.tip a svg{width:13px;height:13px}
+
+/* Finish */
+.finish.milestone{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:6;padding:16px}
+.finish .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:26px 28px;max-width:440px;text-align:center;box-shadow:var(--shadow)}
+.finish .ok{width:52px;height:52px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue)}
+.finish h2{font-family:var(--f-display);font-size:22px;margin:0 0 6px;letter-spacing:-.02em;text-wrap:balance}
+.finish p{margin:0 0 18px;color:var(--muted)}
+
+
+/* ---------- Tutorial completado ---------- */
+.complete{position:fixed;inset:0;z-index:60;background:var(--white);display:flex;flex-direction:column;align-items:center;padding:calc(24px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px));overflow:auto;text-align:center}
+.complete .center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.complete .mark{position:relative;width:clamp(120px,22vmin,190px);aspect-ratio:1;margin-bottom:clamp(20px,4vh,36px)}
+.complete .mark svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.complete .ring{fill:none;stroke:var(--blue);stroke-width:5;stroke-dasharray:340;stroke-dashoffset:0;transform:rotate(-90deg);transform-origin:60px 60px}
+.complete .disc{fill:var(--blue);transform-origin:60px 60px}
+.complete .tick{fill:none;stroke:var(--white);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:80;stroke-dashoffset:0}
+.complete .halo{position:absolute;inset:0;border-radius:50%;background:var(--blue);opacity:0}
+.complete .burst{position:absolute;inset:0}
+.complete .burst i{position:absolute;left:50%;top:50%;width:4px;height:16%;margin-left:-2px;border-radius:2px;background:var(--blue);transform-origin:50% 0;transform:rotate(var(--a)) translateY(62%);opacity:0}
+.complete .burst i:nth-child(even){background:var(--blue-mid);height:10%}
+.complete h2{font-family:var(--f-display);font-weight:800;font-size:clamp(32px,6vw,68px);line-height:1.05;letter-spacing:-.035em;margin:0;color:var(--ink);text-wrap:balance}
+.complete p{margin:14px 0 0;font-size:clamp(15px,1.6vw,19px);color:var(--muted)}
+.complete .home-btn{margin-top:clamp(28px,5vh,48px);font-size:clamp(18px,2.2vw,24px);padding:clamp(15px,2vw,20px) clamp(30px,4vw,48px);animation:none}
+.complete .home-btn svg{width:1em;height:1em}
+.complete.play .ring{animation:drawRing .7s cubic-bezier(.65,0,.35,1) both}
+.complete.play .disc{animation:popDisc .45s cubic-bezier(.2,1.6,.4,1) .6s both}
+.complete.play .tick{animation:drawTick .4s ease-out .95s both}
+.complete.play .halo{animation:halo 1s ease-out 1s both}
+.complete.play .burst i{animation:burst .7s ease-out 1s both}
+.complete.play h2{animation:rise .6s ease-out 1.15s both}
+.complete.play p{animation:rise .6s ease-out 1.3s both}
+.complete.play .home-btn{animation:rise .6s ease-out 1.45s both, blink 1.3s ease-in-out 2.1s infinite}
+@keyframes drawRing{from{stroke-dashoffset:340}to{stroke-dashoffset:0}}
+@keyframes popDisc{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes drawTick{from{stroke-dashoffset:80}to{stroke-dashoffset:0}}
+@keyframes halo{0%{opacity:.35;transform:scale(1)}100%{opacity:0;transform:scale(1.9)}}
+@keyframes burst{0%{opacity:0;transform:rotate(var(--a)) translateY(40%) scaleY(.2)}35%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(95%) scaleY(1)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* Variantes dentro de un paso */
+.variants{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:11px;background:var(--blue-soft)}
+.variants button{appearance:none;border:0;cursor:pointer;font:inherit;font-size:13px;font-weight:600;line-height:1.25;color:var(--blue-deep);background:transparent;border-radius:8px;padding:8px 8px;display:flex;align-items:center;gap:7px;text-align:left}
+.variants button span{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;background:var(--white);color:var(--blue)}
+.variants button.on{background:var(--blue);color:var(--white);box-shadow:0 4px 12px -6px rgba(0,61,112,.6)}
+.variants button.on span{background:var(--white);color:var(--blue)}
+.variants button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.scenario{position:absolute;left:1.6%;top:2.6%;z-index:2;background:var(--blue);color:var(--white);font-family:var(--f-display);font-weight:600;font-size:clamp(11px,1.15cqw,15px);padding:.5em 1em;border-radius:999px;box-shadow:0 6px 18px -8px rgba(0,61,112,.6)}
+
+/* ---------- Panel ---------- */
+.panel{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) auto;gap:16px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.step{display:flex;gap:14px;min-width:0}
+.num{flex:none;width:42px;height:42px;border-radius:10px;background:var(--blue);color:var(--white);display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+.step h1{font-family:var(--f-display);font-size:19px;line-height:1.25;font-weight:600;margin:1px 0 4px;letter-spacing:-.015em;text-wrap:balance}
+.step p{margin:0}
+.step p q{quotes:"“" "”";font-weight:600;overflow-wrap:anywhere}
+.note{margin-top:8px;font-size:13.5px;color:var(--muted)}
+.ext{margin-top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.ext a{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;text-decoration:none;color:var(--blue);background:var(--blue-soft);border:1px solid #BFDAF3;padding:8px 14px;border-radius:9px}
+.ext a:hover{background:#D3E7F9}
+.ext a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.ext a svg{width:15px;height:15px}
+.ext small{font-size:12.5px;color:var(--muted)}
+.result{border-left:1px solid var(--line);padding-left:16px;min-width:0}
+.label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin:2px 0 4px}
+.result p{margin:0;color:var(--muted)}
+.panel{align-items:start;min-height:236px}
+.nav{display:flex;flex-direction:column;justify-content:flex-start;gap:10px;width:196px}
+.nav .btn{font-family:var(--f-display);font-size:16px;font-weight:700;padding:14px 20px;border-radius:11px;width:100%}
+.nav .btn svg{width:18px;height:18px;flex:none}
+.nav #prev{border:2px solid var(--blue);color:var(--blue);background:var(--white)}
+.nav #prev:hover:not(:disabled){background:var(--blue-soft)}
+.nav #prev:not(:disabled){animation:blinkSoft 1.3s ease-in-out infinite}
+.nav #prev:disabled{border-color:var(--line);color:var(--muted);opacity:.55}
+.blink,.nav #next{animation:blink 1.3s ease-in-out infinite}
+.blink:hover,.nav .btn:hover{animation-play-state:paused}
+@keyframes blinkSoft{0%,100%{box-shadow:0 0 0 0 rgba(0,113,206,.35)}50%{box-shadow:0 0 0 7px rgba(0,113,206,0);background:var(--blue-soft)}}
+.milestone{background:rgba(255,255,255,.45)}
+.milestone h2{color:var(--blue);font-size:26px}
+.milestone .btn{font-family:var(--f-display);font-size:15px;padding:12px 18px;white-space:normal;line-height:1.3}
+.btn{appearance:none;font:inherit;font-weight:600;font-size:14px;border-radius:9px;padding:10px 16px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:var(--white)}
+.btn.primary:hover{background:var(--blue-deep);border-color:var(--blue-deep)}
+.btn:hover{border-color:var(--blue)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.hint{font-size:12.5px;color:var(--muted);text-align:center}
+.hint kbd{font:inherit;font-size:11.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--white)}
+
+.pbody{display:contents}
+.khint{display:none;font-size:12px;color:var(--muted);text-align:center}
+.khint kbd{font:inherit;font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--white)}
+
+/* Pantallas horizontales (16:9 / 16:10): todo cabe sin scroll. Navegador a la izquierda, panel a la derecha. */
+@media (min-width:1000px) and (orientation:landscape) and (min-height:520px){
+  html,body{height:100%;overflow:hidden}
+  .app{height:100dvh;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+  .top{padding:8px 24px}
+  .top .logo{height:26px}
+  main{container-type:size;min-height:0;padding:12px 20px;display:flex;align-items:center;justify-content:center}
+  .wrap{--pw:clamp(300px,24vw,380px);--chrome-h:86px;
+        --bw:min(1500px, calc(100cqw - var(--pw) - 18px), calc((100cqh - 30px - var(--chrome-h)) * 1.7615));
+        width:auto;min-width:0;display:grid;grid-template-columns:var(--bw) var(--pw);
+        grid-template-rows:20px calc(var(--bw) / 1.7615 + var(--chrome-h));gap:10px 18px}
+  .progress{grid-column:1/-1}
+  .progress button{padding:8px 0}
+  .browser{width:var(--bw);align-self:start}
+  .panel{display:flex;flex-direction:column;gap:12px;min-height:0;height:100%;padding:18px;overflow:hidden}
+  .pbody{display:flex;flex-direction:column;gap:14px;flex:1;min-height:0;overflow-y:auto;padding-right:2px}
+  .result{border-left:0;border-top:1px solid var(--line);padding:12px 0 0}
+  .nav{flex-direction:row-reverse;width:auto;flex:none}
+  .nav .btn{flex:1;padding:13px 10px;font-size:15px}
+  .khint{display:block;flex:none}
+  .hint{display:none}
+  .sitefoot{padding:8px 16px}
+}
+@media (min-width:1000px) and (orientation:landscape) and (min-height:520px) and (max-height:700px){
+  .step h1{font-size:17px}.step p{font-size:14px}.note{font-size:12.5px}.num{width:36px;height:36px;font-size:16px}
+  .top{padding:6px 24px}.sitefoot{padding:6px 16px}.sitefoot .foot{font-size:11.5px}
+  .ext small{display:none}.ext{margin-top:8px}.ext a{padding:6px 12px;font-size:13px}
+}
+
+@media (max-width:860px){
+  .wrap{width:100%;min-width:0}
+  .panel{grid-template-columns:1fr;padding:16px}
+  .result{border-left:0;border-top:1px solid var(--line);padding:12px 0 0}
+  .panel{min-height:0}
+  .nav{flex-direction:row-reverse;width:auto;order:-1}.nav .btn{flex:1;padding:13px 14px}
+  .tip{display:none}
+  .top .sep,.top .name span{display:none}
+  .tabs{display:none}
+  .toolbar{border-radius:11px 11px 0 0;gap:8px;padding:6px 8px}
+  .toolbar .nav-ico{display:none}
+  .addr{font-size:12px;height:28px}
+}
+@media (max-width:480px){
+  .logo{height:24px}.cover .logo{height:34px}
+  .step h1{font-size:17px}.num{width:36px;height:36px;font-size:16px}.hint{display:none}
+  .finish .card{padding:12px 14px}.finish .card p,.finish .ok{display:none}.finish h2{font-size:17px;margin-bottom:8px}.milestone .btn{font-size:13px;padding:9px 12px}
+  .addr kbd{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+  .hot::after,.ripple,.addr .caret{animation:none!important}
+  .start{animation-duration:2.4s}
+  .complete.play *{animation:none!important}
+}
+</style>
+</head>
+<body>
+<!-- Portada -->
+<section class="cover" id="cover" aria-label="Portada">
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="logo" role="img" aria-label="Axen Capital" viewBox="88 96 1008 440">
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 198.015625 276.496094 L 205.828125 252.34375 L 228.214844 177.386719 L 230.707031 177.386719 L 251.3125 252.34375 L 259.128906 276.496094 Z M 266.921875 107.398438 L 189.476562 107.398438 L 100.316406 366.367188 L 168.882812 366.367188 L 181.679688 327.285156 L 275.109375 327.285156 L 287.546875 366.367188 L 360.371094 366.367188 Z M 266.921875 107.398438 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 628.296875 366.367188 L 815.140625 366.367188 L 815.140625 309.878906 L 694.375 309.878906 L 694.375 258.378906 L 796.667969 258.378906 L 796.667969 205.4375 L 694.375 205.4375 L 694.375 163.882812 L 815.140625 163.882812 L 815.140625 107.398438 L 628.296875 107.398438 Z M 628.296875 366.367188 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 1017.949219 107.398438 L 1017.949219 199.046875 L 1021.847656 271.867188 L 1019.015625 271.867188 L 926.652344 107.398438 L 850.984375 107.398438 L 850.984375 366.367188 L 917.0625 366.367188 L 917.0625 274.003906 L 913.503906 203.65625 L 916.351562 203.65625 L 1008 366.367188 L 1083.667969 366.367188 L 1083.667969 107.398438 Z M 1017.949219 107.398438 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 521.832031 107.398438 L 327.613281 366.367188 L 411.757812 366.367188 L 466.785156 292.976562 L 521.832031 366.367188 L 605.976562 366.367188 L 508.875 236.882812 L 605.976562 107.398438 Z M 521.832031 107.398438 "/>
+<path fill-rule="nonzero" fill="var(--logo-accent)" fill-opacity="1" d="M 437.167969 141.269531 L 411.757812 107.398438 L 327.613281 107.398438 L 395.082031 197.363281 Z M 437.167969 141.269531 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 170.371094 506.980469 C 176.46875 502.730469 180.742188 496.78125 183.195312 489.132812 L 193.960938 491.679688 C 191.03125 501.503906 185.484375 509.316406 177.3125 515.125 C 169.148438 520.933594 159.632812 523.839844 148.773438 523.839844 C 142.066406 523.839844 135.6875 522.585938 129.644531 520.085938 C 123.597656 517.578125 118.3125 514.0625 113.78125 509.527344 C 109.246094 504.996094 105.730469 499.707031 103.222656 493.664062 C 100.726562 487.621094 99.472656 481.246094 99.472656 474.539062 C 99.472656 467.835938 100.726562 461.457031 103.222656 455.414062 C 105.730469 449.371094 109.246094 444.082031 113.78125 439.550781 C 118.3125 435.019531 123.597656 431.496094 129.644531 428.996094 C 135.6875 426.492188 142.066406 425.242188 148.773438 425.242188 C 159.632812 425.242188 169.148438 428.097656 177.3125 433.8125 C 185.484375 439.523438 191.03125 447.152344 193.960938 456.691406 L 183.195312 459.804688 C 180.835938 452.25 176.5625 446.347656 170.371094 442.097656 C 164.191406 437.851562 156.988281 435.722656 148.773438 435.722656 C 143.574219 435.722656 138.664062 436.714844 134.035156 438.699219 C 129.410156 440.683594 125.347656 443.441406 121.859375 446.984375 C 118.363281 450.527344 115.648438 454.683594 113.710938 459.453125 C 111.773438 464.222656 110.804688 469.25 110.804688 474.539062 C 110.804688 479.828125 111.773438 484.855469 113.710938 489.625 C 115.648438 494.398438 118.363281 498.550781 121.859375 502.09375 C 125.347656 505.632812 129.433594 508.394531 134.109375 510.382812 C 138.78125 512.363281 143.667969 513.355469 148.773438 513.355469 C 157.082031 513.355469 164.285156 511.230469 170.371094 506.980469 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 315.246094 440.96875 L 294.5625 487.859375 L 335.789062 487.859375 Z M 350.804688 521.996094 L 340.179688 497.914062 L 290.171875 497.914062 L 279.546875 521.996094 L 267.511719 521.996094 L 310.003906 427.082031 L 320.351562 427.082031 L 362.839844 521.996094 Z M 350.804688 521.996094 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 484.980469 475.953125 C 491.6875 475.953125 497.023438 474.164062 500.984375 470.574219 C 504.953125 466.984375 506.933594 462.308594 506.933594 456.546875 C 506.933594 450.785156 504.953125 446.113281 500.984375 442.527344 C 497.023438 438.933594 491.6875 437.140625 484.980469 437.140625 L 454.808594 437.140625 L 454.808594 475.953125 Z M 484.980469 427.082031 C 488.664062 427.082031 492.421875 427.550781 496.246094 428.5 C 500.066406 429.441406 503.773438 431.238281 507.363281 433.882812 C 510.953125 436.527344 513.621094 439.902344 515.367188 444.011719 C 517.117188 448.117188 517.988281 452.296875 517.988281 456.546875 C 517.988281 460.796875 517.210938 464.738281 515.652344 468.378906 C 514.09375 472.015625 511.871094 475.152344 508.996094 477.796875 C 506.113281 480.445312 502.617188 482.472656 498.511719 483.886719 C 494.402344 485.304688 489.894531 486.015625 484.980469 486.015625 L 454.808594 486.015625 L 454.808594 521.996094 L 443.617188 521.996094 L 443.617188 427.082031 Z M 484.980469 427.082031 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 602.726562 427.082031 L 613.917969 427.082031 L 613.917969 521.996094 L 602.726562 521.996094 Z M 602.726562 427.082031 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 743.265625 437.140625 L 743.265625 521.996094 L 731.933594 521.996094 L 731.933594 437.140625 L 696.660156 437.140625 L 696.660156 427.082031 L 778.402344 427.082031 L 778.402344 437.140625 Z M 743.265625 437.140625 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 889.484375 440.96875 L 868.804688 487.859375 L 910.027344 487.859375 Z M 925.042969 521.996094 L 914.417969 497.914062 L 864.410156 497.914062 L 853.785156 521.996094 L 841.75 521.996094 L 884.242188 427.082031 L 894.589844 427.082031 L 937.082031 521.996094 Z M 925.042969 521.996094 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 1083.445312 521.996094 L 1017.855469 521.996094 L 1017.855469 427.082031 L 1029.046875 427.082031 L 1029.046875 511.796875 L 1083.445312 511.796875 Z M 1083.445312 521.996094 "/>
+</svg>
+
+  <div class="center">
+    <h1>¿Cómo hacer <em>Check In</em>?</h1>
+    <p class="sub">Manual de usuario</p>
+    <button class="start" id="start" type="button">Comenzar
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+  <div class="foot">Manual Creado por Rodrigo Fabela <span class="bar">|</span> Manual de Usuario - Focus <i></i> Plataforma interna de evaluación</div>
+</section>
+
+<!-- Tutorial completado -->
+<section class="complete" id="finish" hidden aria-live="polite" aria-label="Tutorial completado">
+  <div class="center">
+    <div class="mark" aria-hidden="true">
+      <span class="halo"></span>
+      <span class="burst"><i style="--a:0deg"></i><i style="--a:30deg"></i><i style="--a:60deg"></i><i style="--a:90deg"></i><i style="--a:120deg"></i><i style="--a:150deg"></i><i style="--a:180deg"></i><i style="--a:210deg"></i><i style="--a:240deg"></i><i style="--a:270deg"></i><i style="--a:300deg"></i><i style="--a:330deg"></i></span>
+      <svg viewBox="0 0 120 120">
+        <circle class="ring" cx="60" cy="60" r="54"/>
+        <circle class="disc" cx="60" cy="60" r="54"/>
+        <path class="tick" d="M37 62 L53 77 L85 44"/>
+      </svg>
+    </div>
+    <h2>Tutorial completado</h2>
+    <p>Ya sabes cómo hacer Check In y Check Out en Focus.</p>
+    <button class="start home-btn" id="restart" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>
+      Volver a la pantalla de inicio
+    </button>
+  </div>
+  <div class="foot">Manual Creado por Rodrigo Fabela <span class="bar">|</span> Manual de Usuario - Focus <i></i> Plataforma interna de evaluación</div>
+</section>
+
+<div class="app">
+  <header class="top">
+    <button class="home" id="home" type="button" aria-label="Volver a la portada"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="logo" role="img" aria-label="Axen Capital" viewBox="88 96 1008 440">
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 198.015625 276.496094 L 205.828125 252.34375 L 228.214844 177.386719 L 230.707031 177.386719 L 251.3125 252.34375 L 259.128906 276.496094 Z M 266.921875 107.398438 L 189.476562 107.398438 L 100.316406 366.367188 L 168.882812 366.367188 L 181.679688 327.285156 L 275.109375 327.285156 L 287.546875 366.367188 L 360.371094 366.367188 Z M 266.921875 107.398438 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 628.296875 366.367188 L 815.140625 366.367188 L 815.140625 309.878906 L 694.375 309.878906 L 694.375 258.378906 L 796.667969 258.378906 L 796.667969 205.4375 L 694.375 205.4375 L 694.375 163.882812 L 815.140625 163.882812 L 815.140625 107.398438 L 628.296875 107.398438 Z M 628.296875 366.367188 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 1017.949219 107.398438 L 1017.949219 199.046875 L 1021.847656 271.867188 L 1019.015625 271.867188 L 926.652344 107.398438 L 850.984375 107.398438 L 850.984375 366.367188 L 917.0625 366.367188 L 917.0625 274.003906 L 913.503906 203.65625 L 916.351562 203.65625 L 1008 366.367188 L 1083.667969 366.367188 L 1083.667969 107.398438 Z M 1017.949219 107.398438 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 521.832031 107.398438 L 327.613281 366.367188 L 411.757812 366.367188 L 466.785156 292.976562 L 521.832031 366.367188 L 605.976562 366.367188 L 508.875 236.882812 L 605.976562 107.398438 Z M 521.832031 107.398438 "/>
+<path fill-rule="nonzero" fill="var(--logo-accent)" fill-opacity="1" d="M 437.167969 141.269531 L 411.757812 107.398438 L 327.613281 107.398438 L 395.082031 197.363281 Z M 437.167969 141.269531 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 170.371094 506.980469 C 176.46875 502.730469 180.742188 496.78125 183.195312 489.132812 L 193.960938 491.679688 C 191.03125 501.503906 185.484375 509.316406 177.3125 515.125 C 169.148438 520.933594 159.632812 523.839844 148.773438 523.839844 C 142.066406 523.839844 135.6875 522.585938 129.644531 520.085938 C 123.597656 517.578125 118.3125 514.0625 113.78125 509.527344 C 109.246094 504.996094 105.730469 499.707031 103.222656 493.664062 C 100.726562 487.621094 99.472656 481.246094 99.472656 474.539062 C 99.472656 467.835938 100.726562 461.457031 103.222656 455.414062 C 105.730469 449.371094 109.246094 444.082031 113.78125 439.550781 C 118.3125 435.019531 123.597656 431.496094 129.644531 428.996094 C 135.6875 426.492188 142.066406 425.242188 148.773438 425.242188 C 159.632812 425.242188 169.148438 428.097656 177.3125 433.8125 C 185.484375 439.523438 191.03125 447.152344 193.960938 456.691406 L 183.195312 459.804688 C 180.835938 452.25 176.5625 446.347656 170.371094 442.097656 C 164.191406 437.851562 156.988281 435.722656 148.773438 435.722656 C 143.574219 435.722656 138.664062 436.714844 134.035156 438.699219 C 129.410156 440.683594 125.347656 443.441406 121.859375 446.984375 C 118.363281 450.527344 115.648438 454.683594 113.710938 459.453125 C 111.773438 464.222656 110.804688 469.25 110.804688 474.539062 C 110.804688 479.828125 111.773438 484.855469 113.710938 489.625 C 115.648438 494.398438 118.363281 498.550781 121.859375 502.09375 C 125.347656 505.632812 129.433594 508.394531 134.109375 510.382812 C 138.78125 512.363281 143.667969 513.355469 148.773438 513.355469 C 157.082031 513.355469 164.285156 511.230469 170.371094 506.980469 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 315.246094 440.96875 L 294.5625 487.859375 L 335.789062 487.859375 Z M 350.804688 521.996094 L 340.179688 497.914062 L 290.171875 497.914062 L 279.546875 521.996094 L 267.511719 521.996094 L 310.003906 427.082031 L 320.351562 427.082031 L 362.839844 521.996094 Z M 350.804688 521.996094 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 484.980469 475.953125 C 491.6875 475.953125 497.023438 474.164062 500.984375 470.574219 C 504.953125 466.984375 506.933594 462.308594 506.933594 456.546875 C 506.933594 450.785156 504.953125 446.113281 500.984375 442.527344 C 497.023438 438.933594 491.6875 437.140625 484.980469 437.140625 L 454.808594 437.140625 L 454.808594 475.953125 Z M 484.980469 427.082031 C 488.664062 427.082031 492.421875 427.550781 496.246094 428.5 C 500.066406 429.441406 503.773438 431.238281 507.363281 433.882812 C 510.953125 436.527344 513.621094 439.902344 515.367188 444.011719 C 517.117188 448.117188 517.988281 452.296875 517.988281 456.546875 C 517.988281 460.796875 517.210938 464.738281 515.652344 468.378906 C 514.09375 472.015625 511.871094 475.152344 508.996094 477.796875 C 506.113281 480.445312 502.617188 482.472656 498.511719 483.886719 C 494.402344 485.304688 489.894531 486.015625 484.980469 486.015625 L 454.808594 486.015625 L 454.808594 521.996094 L 443.617188 521.996094 L 443.617188 427.082031 Z M 484.980469 427.082031 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 602.726562 427.082031 L 613.917969 427.082031 L 613.917969 521.996094 L 602.726562 521.996094 Z M 602.726562 427.082031 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 743.265625 437.140625 L 743.265625 521.996094 L 731.933594 521.996094 L 731.933594 437.140625 L 696.660156 437.140625 L 696.660156 427.082031 L 778.402344 427.082031 L 778.402344 437.140625 Z M 743.265625 437.140625 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 889.484375 440.96875 L 868.804688 487.859375 L 910.027344 487.859375 Z M 925.042969 521.996094 L 914.417969 497.914062 L 864.410156 497.914062 L 853.785156 521.996094 L 841.75 521.996094 L 884.242188 427.082031 L 894.589844 427.082031 L 937.082031 521.996094 Z M 925.042969 521.996094 "/>
+<path fill-rule="nonzero" fill="var(--logo-ink)" fill-opacity="1" d="M 1083.445312 521.996094 L 1017.855469 521.996094 L 1017.855469 427.082031 L 1029.046875 427.082031 L 1029.046875 511.796875 L 1083.445312 511.796875 Z M 1083.445312 521.996094 "/>
+</svg>
+</button>
+    <div class="sep"></div>
+    <div class="name"><b>¿Cómo hacer Check In?</b><span>Manual de usuario · Focus</span></div>
+    <div class="count" id="count"></div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <nav class="progress" id="progress" aria-label="Pasos"></nav>
+
+      <div class="browser" id="browser">
+        <div class="tabs" aria-hidden="true">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="tab"><span class="fav"></span><span id="tabTitle">Nueva pestaña</span><span class="x">×</span></div>
+          <div class="plus">+</div>
+        </div>
+        <div class="toolbar">
+          <svg class="ico nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          <svg class="ico nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+          <svg class="ico nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>
+          <div class="addr" id="addr">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            <span class="url" id="url"></span><span class="caret" id="caret" hidden></span>
+            <kbd id="enter" hidden>Enter ↵</kbd>
+          </div>
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+        </div>
+        <div class="viewport" id="vp">
+          <div class="newtab" id="newtab" aria-hidden="true">
+            <div class="nt-title">Nueva pestaña</div>
+            <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Busca o escribe una dirección web</div>
+            <div class="tiles"><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <img id="shot" alt="" hidden>
+          <div class="scenario" id="scenario" hidden></div>
+          <div class="finish milestone" id="milestone" hidden>
+            <div class="card">
+              <div class="ok"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+              <h2>¡Check In listo!</h2>
+              <p>Tu entrada quedó registrada a las 09:59 en Oficinas Centro Capital 3M.</p>
+              <button class="btn primary blink" id="toCheckout" type="button">Ahora, para realizar Check Out haz esto:</button>
+            </div>
+          </div>
+        </div>
+        <div class="overlay" id="overlay"></div>
+      </div>
+
+      <section class="panel" aria-live="polite">
+        <div class="pbody">
+        <div class="variants" id="variants" role="tablist" aria-label="Elige tu caso" hidden></div>
+        <div class="step">
+          <div class="num" id="num">1</div>
+          <div style="min-width:0">
+            <h1 id="title"></h1>
+            <p id="action"></p>
+            <div class="note" id="note" hidden></div>
+            <div class="ext" id="ext" hidden>
+              <a href="http://focus.axencapital.com" target="_blank" rel="noopener noreferrer">Abrir Focus en el navegador
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+              <small>Se abre en una pestaña nueva. Este manual sigue abierto aquí.</small>
+            </div>
+          </div>
+        </div>
+        <div class="result">
+          <div class="label">Qué va a pasar</div>
+          <p id="result"></p>
+        </div>
+        </div>
+        <div class="nav">
+          <button class="btn primary" id="next" type="button">Siguiente</button>
+          <button class="btn" id="prev" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Anterior</button>
+        </div>
+        <div class="khint">Haz clic en el recuadro azul o usa las flechas <kbd>←</kbd> <kbd>→</kbd></div>
+      </section>
+      <div class="hint">Haz clic en el recuadro azul o usa las flechas <kbd>←</kbd> <kbd>→</kbd> del teclado</div>
+    </div>
+  </main>
+  <footer class="sitefoot"><div class="foot">Manual Creado por Rodrigo Fabela <span class="bar">|</span> Manual de Usuario - Focus <i></i> Plataforma interna de evaluación</div></footer>
+</div>
+
+<script>
+/* Cada paso: pantalla, textos y zona de clic en % de la imagen (left, top, width, height). */
+const FOCUS_URL = "http://focus.axencapital.com";
+const EXT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
+const STEPS = [
+  { browserStep:true, url:FOCUS_URL, tab:"Nueva pestaña", screen:"Navegador",
+    title:"Entra a Focus desde tu navegador",
+    action:"Abre una pestaña nueva, escribe <q>http://focus.axencapital.com</q> en la barra de direcciones y presiona Enter.",
+    tip:"Coloca la dirección del Focus en tu navegador: <strong class=\"tip-url\">http://focus.axencapital.com</strong>",
+    result:"El navegador carga la pantalla de inicio de sesión de Focus.",
+    hot:"address", ext:true },
+  { img:"img/paso01.jpg", url:FOCUS_URL, tab:"Focus · Axen Capital", screen:"Inicio de sesión",
+    title:"Inicia sesión en Focus",
+    action:"Haz clic en el botón <q>Acceder con Google</q>.",
+    tip:"Haz clic en Acceder con Google",
+    result:"Se abre la ventana de Google para que elijas con qué cuenta entrar.",
+    hot:[53.7,49.7,13,4.7] },
+  { title:"Accede con tu cuenta de Axen Capital", tab:"Acceder con Google", screen:"Cuenta de Google",
+    variants:[
+      { label:"Primera vez", chip:"Si es tu primera vez", img:"img/paso02a.jpg", url:FOCUS_URL, tab:"Focus · Axen Capital", screen:"Iniciar sesión con Google",
+        action:"Si es primera vez, ingresa tu cuenta de correo de Axen Capital en el campo <q>Email or phone</q> y da clic en <q>Next</q>.",
+        note:"Usa tu correo institucional @axencapital.com. Después escribe tu contraseña para continuar.",
+        tip:"Si es primera vez, ingresa tu cuenta de correo de Axen Capital",
+        result:"Google valida tu cuenta y te lleva a la pantalla de Inicio de Focus.",
+        hot:[51.9,43.2,30.1,6.5], zone:[76.8,61.8,5.2,4.6], zoneLabel:"Después: Next", zoneBelow:true, tipPos:"above" },
+      { label:"Ya iniciaste sesión antes", chip:"Si ya iniciaste sesión antes", img:"img/paso02.jpg", url:"https://accounts.google.com", tab:"Acceder con Google", screen:"Selección de cuenta",
+        action:"Si ya has iniciado sesión anteriormente en la plataforma, selecciona tu cuenta <q>@axencapital.com</q>.",
+        note:"Si no aparece tu cuenta, usa la opción Usar otra cuenta y escribe tu correo institucional.",
+        tip:"Selecciona tu cuenta @axencapital.com",
+        result:"Google valida tu identidad y te lleva a la pantalla de Inicio de Focus.",
+        hot:[51.3,37,32.5,6.6] }
+    ] },
+  { img:"img/paso03.jpg", url:FOCUS_URL, tab:"Focus · Inicio", screen:"Inicio",
+    title:"Registra tu entrada",
+    action:"En la pantalla de Inicio, haz clic en <q>Check in</q>.",
+    note:"Debajo del botón verás el aviso Aún no registras tu entrada.",
+    tip:"Haz clic en Check in",
+    result:"Se abre la ventana Registrar entrada, donde indicas desde dónde trabajarás hoy.",
+    hot:[54.35,16.8,7.1,4.1] },
+  { img:"img/paso04.jpg", url:FOCUS_URL, tab:"Focus · Inicio", screen:"Registrar entrada",
+    title:"Abre el lugar de trabajo",
+    action:"Haz clic en el campo <q>Lugar de trabajo</q> para ver las opciones.",
+    note:"Es un campo obligatorio: el botón Terminar se mantiene desactivado hasta que elijas una opción.",
+    tip:"Abre la lista de lugares",
+    result:"Se despliega la lista de lugares de trabajo disponibles.",
+    hot:[34.65,48.9,30.9,5.5] },
+  { img:"img/paso05.jpg", url:FOCUS_URL, tab:"Focus · Inicio", screen:"Lugar de trabajo",
+    title:"Elige desde dónde trabajas",
+    action:"Selecciona la opción que corresponda a tu jornada. En este ejemplo: <q>Oficinas Centro Capital 3M</q>.",
+    note:"Opciones: Remoto, Oficinas Centro Capital 3M, Cluster, Unidad de negocio o Sucursal.",
+    tip:"Selecciona tu lugar de trabajo",
+    result:"La opción queda seleccionada en el campo y el botón Terminar se activa.",
+    hot:[34.65,61.2,30.9,4.4], zone:[34.65,55.6,30.9,25.9], zoneLabel:"Opciones disponibles", tipSide:"right" },
+  { img:"img/paso06.jpg", url:FOCUS_URL, tab:"Focus · Inicio", screen:"Confirmar entrada",
+    title:"Confirma tu entrada",
+    action:"Revisa que el lugar sea correcto y haz clic en <q>Terminar</q>.",
+    tip:"Haz clic en Terminar",
+    result:"Focus guarda tu hora de entrada y regresa a Inicio con el mensaje Entrada registrada a las 09:59.",
+    hot:[58.95,59.9,6.5,5.0] },
+  { milestone:true, img:"img/paso07.jpg", url:FOCUS_URL, tab:"Focus · Inicio", screen:"Check In listo",
+    title:"¡Check In listo!",
+    action:"Tu entrada quedó registrada. Haz clic en <q>Ahora, para realizar Check Out haz esto:</q> para continuar.",
+    note:"Al terminar tu jornada, regresa a Focus para registrar tu salida.",
+    tip:"Ahora, para realizar Check Out haz esto:",
+    result:"Verás cómo registrar tu salida cuando concluya tu jornada.",
+    hot:"milestone" },
+  { img:"img/paso07.jpg", url:FOCUS_URL, tab:"Focus · Inicio", screen:"Entrada registrada",
+    title:"Al terminar tu jornada, registra la salida",
+    action:"Cuando concluyas tu día, haz clic en <q>Check out</q>.",
+    note:"El botón Check in queda desactivado porque tu entrada ya está registrada.",
+    tip:"Haz clic en Check out",
+    result:"Se abre la ventana Registrar salida para confirmar el cierre de tu jornada.",
+    hot:[63,16.5,7.85,4.1], zone:[57.2,21.7,11.5,1.9], zoneLabel:"Hora de entrada", zoneBelow:true },
+  { img:"img/paso08.jpg", url:FOCUS_URL, tab:"Focus · Inicio", screen:"Registrar salida",
+    title:"Confirma tu salida",
+    action:"Haz clic en <q>Confirmar salida</q>.",
+    note:"Importante: una vez registrada la salida, no podrás volver a abrir la jornada de hoy.",
+    tip:"Haz clic en Confirmar salida",
+    result:"Focus guarda tu hora de salida y tu jornada del día queda cerrada.",
+    hot:[55.8,61.9,9.8,5.0], zone:[34.85,43.8,30.75,12.6], zoneLabel:"Aviso" }
+];
+
+const $ = id => document.getElementById(id);
+const cover=$("cover"), browser=$("browser"), vp=$("vp"), shot=$("shot"), newtab=$("newtab"), overlay=$("overlay"), finish=$("finish");
+const addr=$("addr"), urlEl=$("url"), caret=$("caret"), enterK=$("enter");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let i=0, vi=0, busy=false, typer=null;
+const S = () => { const s=STEPS[i]; return s.variants ? {...s, ...s.variants[vi]} : s; };
+
+STEPS.forEach(s=>{ [s,...(s.variants||[])].forEach(x=>{ if(x.img){const im=new Image(); im.src=x.img;} }); });
+
+const prog=$("progress"); prog.style.setProperty("--n",STEPS.length);
+STEPS.forEach((s,k)=>{const b=document.createElement("button");b.type="button";b.title=`Paso ${k+1}: ${s.title}`;b.setAttribute("aria-label",b.title);b.innerHTML="<i></i>";b.onclick=()=>go(k);prog.appendChild(b);});
+
+const hot=document.createElement("button"); hot.className="hot"; hot.type="button";
+const zone=document.createElement("div"); zone.className="zone"; zone.innerHTML="<span></span>";
+const tip=document.createElement("div"); tip.className="tip";
+const cur=document.createElement("div"); cur.className="cursor";
+cur.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 3l14 8.2-6.1 1.3 3.6 6.6-2.6 1.4-3.6-6.6L5 18z" fill="#fff" stroke="#101820" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+overlay.append(zone,hot,tip,cur);
+
+function urlHTML(u){ const m=u.match(/^(https?:\/\/)(.*)$/); return m?`<span class="scheme">${m[1]}</span>${m[2]}`:u; }
+
+function typeUrl(u){
+  clearInterval(typer); enterK.hidden=true; caret.hidden=false; addr.classList.add("focus");
+  if(reduce){ urlEl.innerHTML=urlHTML(u); enterK.hidden=false; return; }
+  let n=0; urlEl.textContent="";
+  setTimeout(()=>{ typer=setInterval(()=>{ n++; urlEl.innerHTML=urlHTML(u.slice(0,n)); if(n>=u.length){clearInterval(typer); enterK.hidden=false;} },70); },500);
+}
+
+// Rect (px, relative to the browser frame) for a step's target
+function rectFor(spec){
+  const fr=browser.getBoundingClientRect();
+  if(spec==="milestone"){ const b=$("toCheckout").getBoundingClientRect(); return {x:b.left-fr.left,y:b.top-fr.top,w:b.width,h:b.height,fw:fr.width,fh:fr.height}; }
+  if(spec==="address"){ const a=addr.getBoundingClientRect(); return {x:a.left-fr.left-5,y:a.top-fr.top-5,w:a.width+10,h:a.height+10,fw:fr.width,fh:fr.height}; }
+  const v=vp.getBoundingClientRect(), [l,t,w,h]=spec;
+  return {x:v.left-fr.left+l/100*v.width, y:v.top-fr.top+t/100*v.height, w:w/100*v.width, h:h/100*v.height, fw:fr.width, fh:fr.height};
+}
+const box=(el,r)=>{el.style.left=r.x+"px";el.style.top=r.y+"px";el.style.width=r.w+"px";el.style.height=r.h+"px";};
+
+function place(){
+  const s=S();
+  const ms = s.hot==="milestone";
+  hot.hidden=ms; tip.hidden=ms;
+  if(ms){
+    zone.hidden=true;
+    const fr=browser.getBoundingClientRect(), b=$("toCheckout").getBoundingClientRect();
+    cur.style.left=(b.left-fr.left+b.width*.62)+"px"; cur.style.top=(b.top-fr.top+b.height*.45)+"px";
+    return;
+  }
+  const r=rectFor(s.hot);
+  box(hot,r); hot.classList.toggle("round",s.hot==="address");
+  if(s.zone){ zone.hidden=false; box(zone,rectFor(s.zone)); zone.firstChild.textContent=s.zoneLabel||""; zone.classList.toggle("below",!!s.zoneBelow); } else zone.hidden=true;
+  const cx=r.x+r.w/2, cy=r.y+r.h/2;
+  const cxCursor = s.hot==="address" ? r.x+Math.min(r.w*.42,260) : cx+Math.min(r.w*.18,24);
+  cur.style.left=cxCursor+"px"; cur.style.top=(cy-6)+"px";
+  // tip
+  tip.innerHTML=`<b>Paso ${i+1}</b>${s.tip}`;
+  const tw=tip.offsetWidth, th=tip.offsetHeight;
+  const below = s.tipPos ? s.tipPos==="below" : (r.y+r.h)/r.fh < .62;
+  const anchor = s.hot==="address" ? cxCursor : cx;
+  const tx=Math.min(Math.max(anchor-tw/2,10),r.fw-tw-10);
+  if(s.tipSide==="right" && r.x+r.w+14+tw < r.fw-10){
+    tip.className="tip right"; tip.style.left=(r.x+r.w+14)+"px"; tip.style.top=(cy-th/2)+"px"; return;
+  }
+  tip.className="tip "+(below?"below":"above");
+  tip.style.left=tx+"px";
+  tip.style.top=(below ? r.y+r.h+14 : r.y-th-14)+"px";
+  tip.style.setProperty("--ax",Math.min(Math.max(anchor-tx,14),tw-14)+"px");
+}
+
+function render(){
+  const s=S();
+  finish.hidden=true;
+  $("milestone").hidden=!s.milestone;
+  $("tabTitle").textContent=s.tab;
+  if(s.browserStep){
+    shot.hidden=true; newtab.hidden=false; typeUrl(s.url);
+  }else{
+    clearInterval(typer); caret.hidden=true; enterK.hidden=true; addr.classList.remove("focus");
+    urlEl.innerHTML=urlHTML(s.url); newtab.hidden=true;
+    const first=shot.hidden; shot.hidden=false;
+    if(shot.getAttribute("src")!==s.img){
+      shot.classList.add("out");
+      setTimeout(()=>{ shot.src=s.img; shot.alt=`Pantalla de Focus: ${s.screen}`; shot.onload=()=>shot.classList.remove("out"); if(shot.complete) shot.classList.remove("out"); }, first?0:180);
+    }
+  }
+  hot.setAttribute("aria-label",s.tip);
+  $("num").textContent=i+1;
+  $("title").textContent=s.title;
+  $("action").innerHTML=s.action;
+  $("result").textContent=s.result;
+  const n=$("note"); n.hidden=!s.note; n.textContent=s.note||"";
+  const vb=$("variants"), sc=$("scenario");
+  if(STEPS[i].variants){
+    vb.hidden=false; sc.hidden=false; sc.textContent=s.chip;
+    vb.innerHTML=STEPS[i].variants.map((v,k)=>`<button type="button" role="tab" aria-selected="${k===vi}" class="${k===vi?"on":""}" data-v="${k}"><span>${String.fromCharCode(65+k)}</span>${v.label}</button>`).join("");
+  } else { vb.hidden=true; sc.hidden=true; }
+  $("ext").hidden=!s.ext;
+  $("count").innerHTML=`Paso <strong>${i+1}</strong> de ${STEPS.length}`;
+  $("prev").disabled=i===0 && vi===0;
+  $("next").innerHTML= (i===STEPS.length-1 ? "Finalizar" : "Siguiente") + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  [...prog.children].forEach((b,k)=>{b.className=k<i?"done":k===i?"current":"";b.setAttribute("aria-current",k===i?"step":"false");});
+  place();
+  if(cover.hidden){ try{history.replaceState(null,"","#paso"+(i+1));}catch(e){} }
+}
+
+function go(k,v){ if(k<0||k>=STEPS.length) return; i=k; vi = v==="last" && STEPS[k].variants ? STEPS[k].variants.length-1 : 0; render(); }
+function back(){ if(STEPS[i].variants && vi>0){ vi--; render(); } else go(i-1,"last"); }
+function advance(fromClick){
+  if(busy || !cover.hidden) return;
+  if(fromClick){
+    const r=rectFor(S().hot), d=document.createElement("div");
+    d.className="ripple"; d.style.left=(r.x+r.w/2)+"px"; d.style.top=(r.y+r.h/2)+"px"; overlay.appendChild(d); setTimeout(()=>d.remove(),600);
+  }
+  busy=true;
+  setTimeout(()=>{ busy=false;
+    if(STEPS[i].variants && vi<STEPS[i].variants.length-1){ vi++; render(); }
+    else if(i<STEPS.length-1) go(i+1);
+    else showDone();
+  }, fromClick?420:0);
+}
+function showDone(){
+  [...prog.children].forEach(b=>b.className="done");
+  finish.classList.remove("play"); finish.hidden=false; void finish.offsetWidth; finish.classList.add("play");
+  setTimeout(()=>{ try{$("restart").focus({preventScroll:true});}catch(e){} }, 1500);
+}
+function showCover(){ finish.hidden=true; cover.hidden=false; clearInterval(typer); try{history.replaceState(null,"",location.pathname+location.search);}catch(e){} $("start").focus(); }
+function start(){ cover.hidden=true; go(0); }
+
+hot.addEventListener("click",()=>advance(true));
+$("next").onclick=()=>advance(false);
+$("prev").onclick=back;
+$("variants").addEventListener("click",e=>{ const b=e.target.closest("button[data-v]"); if(!b) return; vi=+b.dataset.v; render(); });
+$("restart").onclick=showCover;
+$("toCheckout").onclick=()=>advance(true);
+$("home").onclick=showCover;
+$("start").onclick=start;
+document.addEventListener("keydown",e=>{
+  if(!cover.hidden){ if(e.key==="Enter"&&document.activeElement===document.body) start(); return; }
+  if(!finish.hidden){ if(e.key==="ArrowLeft") render(); return; }
+  if(e.key==="ArrowRight") advance(false);
+  else if(e.key==="ArrowLeft") back();
+});
+new ResizeObserver(()=>{ if(cover.hidden) place(); }).observe(browser);
+
+const m=(location.hash||"").match(/^#paso(\d+)$/);
+if(m){ i=Math.min(Math.max(+m[1]-1,0),STEPS.length-1); cover.hidden=true; render(); }
+else { render(); }
+</script>
+</body>
+</html>
