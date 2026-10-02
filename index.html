@@ -428,6 +428,8 @@ main{flex:1;display:flex;flex-direction:column;align-items:center;padding:18px 1
 <script>
 /* Cada paso: pantalla, textos y zona de clic en % de la imagen (left, top, width, height). */
 const FOCUS_URL = "http://focus.axencapital.com";
+const ASSET_V = "20261002c"; // cambia este valor cada vez que actualices imágenes
+const asset = u => u + "?v=" + ASSET_V;
 const EXT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
 const STEPS = [
   { browserStep:true, url:FOCUS_URL, tab:"Nueva pestaña", screen:"Navegador",
@@ -514,7 +516,7 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let i=0, vi=0, busy=false, typer=null;
 const S = () => { const s=STEPS[i]; return s.variants ? {...s, ...s.variants[vi]} : s; };
 
-STEPS.forEach(s=>{ [s,...(s.variants||[])].forEach(x=>{ if(x.img){const im=new Image(); im.src=x.img;} }); });
+STEPS.forEach(s=>{ [s,...(s.variants||[])].forEach(x=>{ if(x.img){const im=new Image(); im.src=asset(x.img);} }); });
 
 const prog=$("progress"); prog.style.setProperty("--n",STEPS.length);
 STEPS.forEach((s,k)=>{const b=document.createElement("button");b.type="button";b.title=`Paso ${k+1}: ${s.title}`;b.setAttribute("aria-label",b.title);b.innerHTML="<i></i>";b.onclick=()=>go(k);prog.appendChild(b);});
@@ -587,9 +589,9 @@ function render(){
     clearInterval(typer); caret.hidden=true; enterK.hidden=true; addr.classList.remove("focus");
     urlEl.innerHTML=urlHTML(s.url); newtab.hidden=true;
     const first=shot.hidden; shot.hidden=false;
-    if(shot.getAttribute("src")!==s.img){
+    if(shot.getAttribute("src")!==asset(s.img)){
       shot.classList.add("out");
-      setTimeout(()=>{ shot.src=s.img; shot.alt=`Pantalla de Focus: ${s.screen}`; shot.onload=()=>shot.classList.remove("out"); if(shot.complete) shot.classList.remove("out"); }, first?0:180);
+      setTimeout(()=>{ shot.src=asset(s.img); shot.alt=`Pantalla de Focus: ${s.screen}`; shot.onload=()=>shot.classList.remove("out"); if(shot.complete) shot.classList.remove("out"); }, first?0:180);
     }
   }
   hot.setAttribute("aria-label",s.tip);
