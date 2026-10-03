@@ -23,6 +23,8 @@ manual-focus-checkin/
 ├── assets/
 │   ├── logo-axen-capital.svg
 │   └── favicon.svg
+├── manual-focus-checkin.pdf   # Versión descargable
+├── tools/generar-pdf.mjs     # Regenera el PDF
 ├── vercel.json
 └── README.md
 ```
@@ -40,7 +42,21 @@ Los textos y zonas de clic están en el arreglo `STEPS` dentro de `index.html`. 
 - `hot`: zona de clic en % de la imagen `[izquierda, arriba, ancho, alto]`
 - `zone` / `zoneLabel` (opcional): área informativa punteada
 
-Para deep links usa `#paso1` … `#paso10` (por ejemplo `https://tu-dominio/#paso4`).
+El manual siempre inicia en la portada: las direcciones directas como `#paso4` se ignoran y la barra de progreso
+solo permite regresar a pasos ya vistos.
+
+## PDF descargable
+
+`manual-focus-checkin.pdf` se genera automáticamente desde el manual (capturas de cada paso + textos).
+Si cambias textos o imágenes, vuelve a generarlo:
+
+```bash
+npm i -D playwright
+npx playwright install chromium
+node tools/generar-pdf.mjs
+```
+
+La dirección que se comparte está en la constante `CANON` dentro de `index.html`.
 
 ## Subir a GitHub
 

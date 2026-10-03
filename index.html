@@ -179,6 +179,23 @@ main{flex:1;display:flex;flex-direction:column;align-items:center;padding:18px 1
 .variants button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .scenario{position:absolute;left:1.6%;top:2.6%;z-index:2;background:var(--blue);color:var(--white);font-family:var(--f-display);font-weight:600;font-size:clamp(11px,1.15cqw,15px);padding:.5em 1em;border-radius:999px;box-shadow:0 6px 18px -8px rgba(0,61,112,.6)}
 
+/* Compartir y PDF */
+.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:clamp(18px,3vh,28px)}
+.act{appearance:none;font:inherit;font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;border:1.5px solid var(--line);background:var(--white);color:var(--blue-deep);text-decoration:none;cursor:pointer;transition:background .2s,border-color .2s}
+.act:hover,.act[aria-expanded="true"]{border-color:var(--blue);background:var(--blue-soft)}
+.act:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.act svg{width:17px;height:17px;flex:none}
+.share-wrap{position:relative}
+.share-menu{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);min-width:220px;background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 40px -16px rgba(0,61,112,.45);padding:6px;display:flex;flex-direction:column;gap:2px;z-index:5;text-align:left}
+.share-menu > *{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:inherit;font-size:14px;font-weight:600;color:var(--ink);text-decoration:none;background:none;border:0;cursor:pointer;text-align:left}
+.share-menu > *:hover,.share-menu > *:focus-visible{background:var(--blue-soft);color:var(--blue-deep);outline:none}
+.share-menu svg{width:17px;height:17px;color:var(--blue);flex:none}
+.share-menu > [hidden]{display:none}
+.share-menu.down{bottom:auto;top:calc(100% + 8px)}
+.toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;background:var(--ink);color:var(--white);font-weight:600;font-size:14px;padding:11px 18px;border-radius:10px;box-shadow:0 12px 30px -10px rgba(0,0,0,.45);max-width:calc(100% - 32px);overflow-wrap:anywhere;text-align:center}
+.complete.play .actions{animation:rise .6s ease-out 1.6s both}
+.progress button:disabled{cursor:not-allowed}
+
 /* ---------- Panel ---------- */
 .panel{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) auto;gap:16px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
 .step{display:flex;gap:14px;min-width:0}
@@ -303,6 +320,18 @@ main{flex:1;display:flex;flex-direction:column;align-items:center;padding:18px 1
     <button class="start" id="start" type="button">Comenzar
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </button>
+    <div class="actions">
+      <div class="share-wrap">
+        <button class="act" type="button" data-share aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Compartir manual</button>
+        <div class="share-menu" role="menu" hidden>
+          <button type="button" role="menuitem" data-act="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Copiar enlace</button>
+          <a role="menuitem" data-act="wa" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 2 1-.5 1.6c-3.6.4-8.5-4.5-8.1-8.1L9.7 6.8l1 2z"/></svg>WhatsApp</a>
+          <a role="menuitem" data-act="mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></svg>Correo</a>
+          <button type="button" role="menuitem" data-act="native" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>Más opciones…</button>
+        </div>
+      </div>
+      <a class="act" data-pdf download="Manual-Focus-Check-In.pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar PDF</a>
+    </div>
   </div>
   <div class="foot">Manual Creado por Rodrigo Fabela <span class="bar">|</span> Manual de Usuario - Focus <i></i> Plataforma interna de evaluación</div>
 </section>
@@ -325,9 +354,23 @@ main{flex:1;display:flex;flex-direction:column;align-items:center;padding:18px 1
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>
       Volver a la pantalla de inicio
     </button>
+    <div class="actions">
+      <div class="share-wrap">
+        <button class="act" type="button" data-share aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Compartir manual</button>
+        <div class="share-menu" role="menu" hidden>
+          <button type="button" role="menuitem" data-act="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Copiar enlace</button>
+          <a role="menuitem" data-act="wa" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 2 1-.5 1.6c-3.6.4-8.5-4.5-8.1-8.1L9.7 6.8l1 2z"/></svg>WhatsApp</a>
+          <a role="menuitem" data-act="mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></svg>Correo</a>
+          <button type="button" role="menuitem" data-act="native" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>Más opciones…</button>
+        </div>
+      </div>
+      <a class="act" data-pdf download="Manual-Focus-Check-In.pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar PDF</a>
+    </div>
   </div>
   <div class="foot">Manual Creado por Rodrigo Fabela <span class="bar">|</span> Manual de Usuario - Focus <i></i> Plataforma interna de evaluación</div>
 </section>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <div class="app">
   <header class="top">
@@ -519,7 +562,8 @@ const S = () => { const s=STEPS[i]; return s.variants ? {...s, ...s.variants[vi]
 STEPS.forEach(s=>{ [s,...(s.variants||[])].forEach(x=>{ if(x.img){const im=new Image(); im.src=asset(x.img);} }); });
 
 const prog=$("progress"); prog.style.setProperty("--n",STEPS.length);
-STEPS.forEach((s,k)=>{const b=document.createElement("button");b.type="button";b.title=`Paso ${k+1}: ${s.title}`;b.setAttribute("aria-label",b.title);b.innerHTML="<i></i>";b.onclick=()=>go(k);prog.appendChild(b);});
+let maxReached=0;
+STEPS.forEach((s,k)=>{const b=document.createElement("button");b.type="button";b.title=`Paso ${k+1}: ${s.title}`;b.setAttribute("aria-label",b.title);b.innerHTML="<i></i>";b.onclick=()=>{ if(k<=maxReached) go(k); };prog.appendChild(b);});
 
 const hot=document.createElement("button"); hot.className="hot"; hot.type="button";
 const zone=document.createElement("div"); zone.className="zone"; zone.innerHTML="<span></span>";
@@ -609,9 +653,9 @@ function render(){
   $("count").innerHTML=`Paso <strong>${i+1}</strong> de ${STEPS.length}`;
   $("prev").disabled=i===0 && vi===0;
   $("next").innerHTML= (i===STEPS.length-1 ? "Finalizar" : "Siguiente") + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-  [...prog.children].forEach((b,k)=>{b.className=k<i?"done":k===i?"current":"";b.setAttribute("aria-current",k===i?"step":"false");});
+  maxReached=Math.max(maxReached,i);
+  [...prog.children].forEach((b,k)=>{b.className=k<i?"done":k===i?"current":"";b.disabled=k>maxReached;b.setAttribute("aria-current",k===i?"step":"false");});
   place();
-  if(cover.hidden){ try{history.replaceState(null,"","#paso"+(i+1));}catch(e){} }
 }
 
 function go(k,v){ if(k<0||k>=STEPS.length) return; i=k; vi = v==="last" && STEPS[k].variants ? STEPS[k].variants.length-1 : 0; render(); }
@@ -635,7 +679,7 @@ function showDone(){
   setTimeout(()=>{ try{$("restart").focus({preventScroll:true});}catch(e){} }, 1500);
 }
 function showCover(){ finish.hidden=true; cover.hidden=false; clearInterval(typer); try{history.replaceState(null,"",location.pathname+location.search);}catch(e){} $("start").focus(); }
-function start(){ cover.hidden=true; go(0); }
+function start(){ maxReached=0; cover.hidden=true; go(0); }
 
 hot.addEventListener("click",()=>advance(true));
 $("next").onclick=()=>advance(false);
@@ -653,9 +697,39 @@ document.addEventListener("keydown",e=>{
 });
 new ResizeObserver(()=>{ if(cover.hidden) place(); }).observe(browser);
 
-const m=(location.hash||"").match(/^#paso(\d+)$/);
-if(m){ i=Math.min(Math.max(+m[1]-1,0),STEPS.length-1); cover.hidden=true; render(); }
-else { render(); }
+/* Candado: el manual siempre inicia en la portada. Las direcciones directas (#paso3, etc.) se ignoran. */
+const clearHash=()=>{ try{ if(location.hash) history.replaceState(null,"",location.pathname+location.search); }catch(e){} };
+clearHash(); window.addEventListener("hashchange",clearHash);
+render();
+
+/* Compartir y descargar PDF */
+const CANON="https://manual-checkin.vercel.app/";
+const PDF_FILE="manual-focus-checkin.pdf";
+const onSite = location.protocol==="file:" || /(^|\.)vercel\.app$|axencapital\.com$/.test(location.hostname);
+const SHARE_URL = onSite && /^https?:$/.test(location.protocol) ? location.origin+location.pathname : CANON;
+const SHARE_TITLE="Manual Focus · ¿Cómo hacer Check In?";
+const SHARE_TEXT="Manual de usuario de Focus para hacer Check In y Check Out:";
+const enc=encodeURIComponent;
+let toastT=null;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
+function copyText(txt){
+  const fallback=()=>{ const ta=document.createElement("textarea"); ta.value=txt; ta.setAttribute("readonly",""); ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(e){} ta.remove(); toast(ok?"Enlace copiado":"Copia este enlace: "+txt); };
+  try{ navigator.clipboard.writeText(txt).then(()=>toast("Enlace copiado"),fallback); }catch(e){ fallback(); }
+}
+function closeMenus(except){ document.querySelectorAll(".share-wrap").forEach(w=>{ if(w===except) return; w.querySelector(".share-menu").hidden=true; w.querySelector("[data-share]").setAttribute("aria-expanded","false"); }); }
+document.querySelectorAll(".share-wrap").forEach(w=>{
+  const btn=w.querySelector("[data-share]"), menu=w.querySelector(".share-menu");
+  w.querySelector('[data-act="wa"]').href=`https://wa.me/?text=${enc(SHARE_TEXT+" "+SHARE_URL)}`;
+  w.querySelector('[data-act="mail"]').href=`mailto:?subject=${enc(SHARE_TITLE)}&body=${enc(SHARE_TEXT+"\n"+SHARE_URL)}`;
+  const nat=w.querySelector('[data-act="native"]'); nat.hidden=!navigator.share;
+  btn.addEventListener("click",e=>{ e.stopPropagation(); const open=menu.hidden; closeMenus(); menu.hidden=!open; btn.setAttribute("aria-expanded",String(open)); if(open){ const r=btn.getBoundingClientRect(); menu.classList.toggle("down", innerHeight-r.bottom > menu.offsetHeight+16); } if(open) menu.querySelector("[role=menuitem]").focus(); });
+  w.querySelector('[data-act="copy"]').addEventListener("click",()=>{ copyText(SHARE_URL); closeMenus(); });
+  nat.addEventListener("click",()=>{ closeMenus(); navigator.share({title:SHARE_TITLE,text:SHARE_TEXT,url:SHARE_URL}).catch(()=>{}); });
+  menu.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>closeMenus()));
+});
+document.addEventListener("click",e=>{ if(!e.target.closest(".share-wrap")) closeMenus(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeMenus(); },true);
+document.querySelectorAll("[data-pdf]").forEach(a=>{ a.href = onSite ? PDF_FILE : CANON+PDF_FILE; if(!onSite){ a.removeAttribute("download"); a.target="_blank"; a.rel="noopener"; } });
 </script>
 </body>
 </html>
